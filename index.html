@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="TaskFlow: A unified dashboard for freelancers to manage tasks, deadlines, and clients. Sign up for early access today.">
+    <meta name="theme-color" content="#667eea">
+    <meta name="robots" content="index, follow">
+    <title>TaskFlow - Freelancer Task & Client Management Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #764ba2;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666;
+            --bg-light: #f8f9fc;
+            --bg-darker: #0f1419;
+            --spacing-unit: 1rem;
+            --transition-smooth: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* ==================== ACCESSIBILITY ==================== */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        .skip-to-main {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--primary);
+            color: white;
+            padding: 0.8rem 1rem;
+            text-decoration: none;
+            z-index: 100;
+            font-weight: 600;
+        }
+
+        .skip-to-main:focus {
+            top: 0;
+        }
+
+        *:focus-visible {
+            outline: 3px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        /* Reduce motion for users with motion sensitivity */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: more) {
+            :root {
+                --text-primary: #000;
+                --text-secondary: #333;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            line-height: 1.65;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            letter-spacing: 0.3px;
+            will-change: auto;
+        }
+
+        /* ==================== HEADER ==================== */
+        header {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 1.2rem 2rem;
+            position: sticky;
+            top: 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            z-index: 100;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        header nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition-smooth);
+        }
+
+        .logo:hover {
+            filter: brightness(1.1);
+        }
+
+        .nav-cta {
+            display: inline-block;
+            padding: 0.6rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: var(--transition-bounce);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.35s ease;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            transition: width 0.35s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* ==================== HERO ==================== */
+        .hero {
+            padding: 7rem 2rem 5rem;
+            text-align: center;
+            color: white;
+            max-width: 950px;
+            margin: 0 auto;
+            animation: fadeInUp 0.7s ease 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: 3.8rem;
+            margin-bottom: 1.2rem;
+            font-weight: 900;
+            line-height: 1.15;
+            letter-spacing: -1px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 3.5rem;
+            opacity: 0.95;
+            line-height: 1.75;
+            font-weight: 300;
+            letter-spacing: 0.3px;
+        }
+
+        /* ==================== FORM ==================== */
+        .waitlist-form {
+            background: white;
+            padding: 2.8rem;
+            border-radius: 16px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.15);
+            margin-bottom: 4rem;
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: scaleIn 0.6s ease 0.4s both;
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1.8rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.7rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.85;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem 1.1rem;
+            border: 2px solid #e8e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: var(--transition-smooth);
+            font-family: inherit;
+            background: #fafbfc;
+            color: var(--text-primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .form-group input::placeholder {
+            color: #999;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.12), 0 2px 8px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1.1rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition-bounce);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: left 0.4s ease;
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.35);
+        }
+
+        .submit-btn:active:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .form-message {
+            margin-top: 1.3rem;
+            padding: 1.1rem;
+            border-radius: 10px;
+            display: none;
+            text-align: center;
+            font-weight: 500;
+            font-size: 0.95rem;
+            animation: slideInUp 0.3s ease;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-message.success {
+            background: #e7f5f0;
+            color: #0d5d50;
+            border: 1px solid #a8ddd4;
+        }
+
+        .form-message.error {
+            background: #fde8e8;
+            color: #7a1f1f;
+            border: 1px solid #f4b5b5;
+        }
+
+        /* ==================== FEATURES ==================== */
+        .features {
+            background: white;
+            padding: 6rem 2rem;
+            margin-top: 2rem;
+        }
+
+        .features-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features-title {
+            text-align: center;
+            font-size: 2.8rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+            animation: fadeInUp 0.6s ease 0.3s both;
+        }
+
+        .features-subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 4rem;
+            font-weight: 300;
+            animation: fadeInUp 0.6s ease 0.4s both;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 2.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .feature-card {
+            padding: 2.2rem;
+            background: linear-gradient(135deg, #f9fafb 0%, #f4f7fc 100%);
+            border-radius: 14px;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            transition: var(--transition-bounce);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease both;
+        }
+
+        .feature-card:nth-child(1) { animation-delay: 0.3s; }
+        .feature-card:nth-child(2) { animation-delay: 0.4s; }
+        .feature-card:nth-child(3) { animation-delay: 0.5s; }
+        .feature-card:nth-child(4) { animation-delay: 0.6s; }
+        .feature-card:nth-child(5) { animation-delay: 0.7s; }
+        .feature-card:nth-child(6) { animation-delay: 0.8s; }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -2px;
+            width: 4px;
+            height: 0;
+            background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+            transition: height 0.5s ease;
+        }
+
+        .feature-card:hover::before {
+            height: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 50px rgba(102, 126, 234, 0.12);
+            border-color: rgba(102, 126, 234, 0.2);
+            background: linear-gradient(135deg, #fff 0%, #f9fbfc 100%);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1.2rem;
+            display: inline-block;
+            transition: var(--transition-bounce);
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.15) rotate(5deg);
+        }
+
+        .feature-card h3 {
+            font-size: 1.35rem;
+            margin-bottom: 0.9rem;
+            color: var(--text-primary);
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            font-size: 0.95rem;
+            font-weight: 300;
+        }
+
+        /* ==================== STATS ==================== */
+        .stats {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 3.5rem 2rem;
+            border-radius: 16px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.25);
+            animation: fadeInUp 0.6s ease 0.5s both;
+        }
+
+        .stat {
+            padding: 1.5rem;
+            transition: var(--transition-bounce);
+        }
+
+        .stat:hover {
+            transform: scale(1.05);
+        }
+
+        .stat-number {
+            font-size: 2.8rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+
+        .stat-label {
+            opacity: 0.92;
+            font-size: 0.9rem;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ==================== FOOTER ==================== */
+        footer {
+            background: var(--bg-darker);
+            color: white;
+            text-align: center;
+            padding: 3.5rem 2rem 2rem;
+            margin-top: 4rem;
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        footer p {
+            opacity: 0.75;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .separator {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .footer-tagline {
+            opacity: 0.6;
+            font-size: 0.8rem;
+            font-style: italic;
+            margin-top: 1.5rem;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .social-links a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+
+        .social-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--primary);
+            transition: width 0.35s ease;
+        }
+
+        .social-links a:hover {
+            color: #fff;
+        }
+
+        .social-links a:hover::after {
+            width: 100%;
+            background: white;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 768px) {
+            :root {
+                --spacing-unit: 0.75rem;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.05rem;
+                margin-bottom: 2.5rem;
+            }
+
+            .nav-links {
+                gap: 1.5rem;
+            }
+
+            .hero {
+                padding: 3.5rem 1.5rem;
+            }
+
+            .waitlist-form {
+                padding: 2rem;
+            }
+
+            .features-title {
+                font-size: 2.2rem;
+            }
+
+            .features-grid {
+                gap: 1.8rem;
+            }
+
+            .feature-card {
+                padding: 1.8rem;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 1rem 1.5rem;
+            }
+
+            header nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+            }
+
+            .nav-cta {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.8rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+                margin-bottom: 1rem;
+            }
+
+            .hero p {
+                font-size: 0.95rem;
+            }
+
+            .features {
+                padding: 4rem 1.5rem;
+            }
+
+            .features-title {
+                font-size: 1.75rem;
+            }
+
+            .form-group input,
+            .submit-btn {
+                font-size: 16px;
+            }
+        }
+
+        /* Landscape orientation optimization */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .hero {
+                padding: 2rem 1.5rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .hero p {
+                font-size: 0.95rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .waitlist-form {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Large desktop screens */
+        @media (min-width: 1200px) {
+            header nav {
+                padding: 0 2rem;
+            }
+
+            .hero {
+                padding: 8rem 2rem 6rem;
+            }
+        }
+
+        /* ==================== PROBLEM & SOLUTION SECTION ==================== */
+        .problem-solution {
+            background: #f8f9fc;
+            padding: 5rem 2rem;
+        }
+
+        .problem-solution-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .problem-solution h2 {
+            font-size: 2.2rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            line-height: 1.2;
+            animation: fadeInUp 0.6s ease 0.3s both;
+        }
+
+        .problem-list, .solution-list {
+            list-style: none;
+            animation: fadeInUp 0.6s ease 0.4s both;
+        }
+
+        .problem-list li, .solution-list li {
+            font-size: 1.05rem;
+            margin-bottom: 1.2rem;
+            padding-left: 2rem;
+            position: relative;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .problem-list li::before {
+            content: '✕';
+            position: absolute;
+            left: 0;
+            color: #e74c3c;
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        .solution-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #27ae60;
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        .solution-list li {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .problem-column h3, .solution-column h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        /* ==================== SOCIAL PROOF SECTION ==================== */
+        .social-proof {
+            background: white;
+            padding: 5rem 2rem;
+        }
+
+        .social-proof-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .social-proof-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            animation: fadeInUp 0.6s ease 0.3s both;
+        }
+
+        .social-proof-subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 3.5rem;
+            font-weight: 300;
+            animation: fadeInUp 0.6s ease 0.4s both;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .testimonial {
+            background: linear-gradient(135deg, #f9fafb 0%, #f4f7fc 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            transition: var(--transition-bounce);
+            animation: fadeInUp 0.6s ease both;
+        }
+
+        .testimonial:nth-child(1) { animation-delay: 0.4s; }
+        .testimonial:nth-child(2) { animation-delay: 0.5s; }
+        .testimonial:nth-child(3) { animation-delay: 0.6s; }
+
+        .testimonial:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.1);
+        }
+
+        .testimonial-text {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .author-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .author-info h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.2rem;
+        }
+
+        .author-info p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .trust-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            padding: 2rem 0;
+            border-top: 1px solid rgba(102, 126, 234, 0.1);
+            animation: fadeInUp 0.6s ease 0.5s both;
+        }
+
+        .trust-indicator {
+            text-align: center;
+        }
+
+        .trust-icon {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .trust-text {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* ==================== HOW IT WORKS SECTION ==================== */
+        .how-it-works {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 5rem 2rem;
+        }
+
+        .how-it-works-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .how-it-works h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 3.5rem;
+            animation: fadeInUp 0.6s ease 0.3s both;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .step {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2.5rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            transition: var(--transition-bounce);
+            animation: fadeInUp 0.6s ease both;
+        }
+
+        .step:nth-child(1) { animation-delay: 0.4s; }
+        .step:nth-child(2) { animation-delay: 0.5s; }
+        .step:nth-child(3) { animation-delay: 0.6s; }
+
+        .step:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .step-number {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        .step h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+        }
+
+        .step p {
+            font-size: 0.95rem;
+            opacity: 0.95;
+            line-height: 1.7;
+        }
+
+        .step::after {
+            content: '→';
+            position: absolute;
+            right: -2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            font-weight: 700;
+            opacity: 0.5;
+        }
+
+        .step:last-child::after {
+            content: '';
+        }
+
+        /* ==================== WAITLIST SECTION ==================== */
+        .waitlist-section {
+            background: white;
+            padding: 5rem 2rem;
+        }
+
+        .waitlist-section-container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .waitlist-section h2 {
+            font-size: 2.2rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            animation: fadeInUp 0.6s ease 0.3s both;
+        }
+
+        .waitlist-section p {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+            animation: fadeInUp 0.6s ease 0.4s both;
+        }
+
+        /* ==================== FINAL CTA SECTION ==================== */
+        .final-cta {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            padding: 4rem 2rem;
+            border-top: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .final-cta-container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .final-cta h2 {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            animation: fadeInUp 0.6s ease 0.3s both;
+        }
+
+        .urgency-message {
+            font-size: 1.15rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            animation: fadeInUp 0.6s ease 0.4s both;
+        }
+
+        .cta-subtext {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            animation: fadeInUp 0.6s ease 0.5s both;
+        }
+
+        .final-cta-btn {
+            display: inline-block;
+            padding: 1.2rem 3rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            transition: var(--transition-bounce);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.25);
+            cursor: pointer;
+            border: none;
+            animation: fadeInUp 0.6s ease 0.6s both;
+        }
+
+        .final-cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 40px rgba(102, 126, 234, 0.35);
+        }
+
+        /* ==================== RESPONSIVE UPDATES ==================== */
+        @media (max-width: 768px) {
+            .problem-solution-container {
+                grid-template-columns: 1fr;
+                gap: 2.5rem;
+            }
+
+            .how-it-works-container {
+                max-width: 100%;
+            }
+
+            .step::after {
+                content: '↓';
+                right: auto;
+                bottom: -2rem;
+                top: auto;
+            }
+
+            .step:last-child::after {
+                content: '';
+            }
+
+            .steps-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .trust-indicators {
+                gap: 1rem;
+            }
+
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .final-cta h2 {
+                font-size: 1.75rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .problem-solution {
+                padding: 3.5rem 1.5rem;
+            }
+
+            .social-proof {
+                padding: 3.5rem 1.5rem;
+            }
+
+            .how-it-works {
+                padding: 3.5rem 1.5rem;
+            }
+
+            .waitlist-section {
+                padding: 3.5rem 1.5rem;
+            }
+
+            .final-cta {
+                padding: 3rem 1.5rem;
+            }
+
+            .problem-solution h2,
+            .social-proof-title,
+            .how-it-works h2,
+            .waitlist-section h2,
+            .final-cta h2 {
+                font-size: 1.5rem;
+            }
+
+            .step-number {
+                font-size: 2.2rem;
+            }
+
+            .final-cta-btn {
+                width: 100%;
+                padding: 1rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav role="navigation" aria-label="Main navigation">
+            <a href="#main" class="skip-to-main">Skip to main content</a>
+            <a href="#" class="logo" aria-label="TaskFlow - Home">⚡ TaskFlow</a>
+            <a href="#waitlist" class="nav-cta" aria-label="Get early access to TaskFlow">Get Early Access</a>
+        </nav>
+    </header>
+
+    <main id="main" role="main">
+        <section class="hero" aria-label="Welcome to TaskFlow">
+            <h1>Finally, One Dashboard for Everything</h1>
+            <p>Stop juggling tools. Manage tasks, deadlines, and clients in one beautiful dashboard designed specifically for freelancers. Get back 5+ hours every week.</p>
+            
+            <form class="waitlist-form" id="waitlistForm" aria-label="Email signup form for early access">
+                <div class="form-group">
+                    <label for="email">Email <span aria-label="required">*</span></label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        placeholder="you@example.com"
+                        required
+                        autocomplete="email"
+                        aria-required="true"
+                        aria-describedby="email-hint"
+                    >
+                    <span id="email-hint" class="sr-only">We'll never share your email.</span>
+                </div>
+                <div class="form-group">
+                    <label for="name">Name <span aria-label="required">*</span></label>
+                    <input 
+                        type="text" 
+                        id="name" 
+                        name="name" 
+                        placeholder="Your name"
+                        required
+                        autocomplete="given-name"
+                        aria-required="true"
+                    >
+                </div>
+                <button type="submit" class="submit-btn" aria-busy="false">Join the Waitlist</button>
+                <div class="form-message" id="formMessage" role="status" aria-live="polite" aria-atomic="true"></div>
+            </form>
+        </section>
+
+        <section class="features" id="features" aria-label="Key features of TaskFlow">
+            <div class="features-container">
+                <h2 class="features-title">Everything Freelancers Actually Need</h2>
+                <p class="features-subtitle">No bloated features. Just the tools that save you time and make more money.</p>
+                
+                <div class="features-grid" role="list">
+                    <div class="feature-card" role="listitem">
+                        <div class="feature-icon" aria-hidden="true">📋</div>
+                        <h3>One Dashboard</h3>
+                        <p>All tasks, projects, and deadlines in one beautiful view. No more context switching.</p>
+                    </div>
+                    
+                    <div class="feature-card" role="listitem">
+                        <div class="feature-icon" aria-hidden="true">👥</div>
+                        <h3>Client Profiles</h3>
+                        <p>Contact info, rates, project history—everything about your client in one place.</p>
+                    </div>
+                    
+                    <div class="feature-card" role="listitem">
+                        <div class="feature-icon" aria-hidden="true">📊</div>
+                        <h3>Real Analytics</h3>
+                        <p>Know your most profitable clients, track time per project, and measure productivity.</p>
+                    </div>
+                    
+                    <div class="feature-card" role="listitem">
+                        <div class="feature-icon" aria-hidden="true">⏰</div>
+                        <h3>Never Miss a Deadline</h3>
+                        <p>Smart reminders keep you on track. No more late deliverables or disappointed clients.</p>
+                    </div>
+                    
+                    <div class="feature-card" role="listitem">
+                        <div class="feature-icon" aria-hidden="true">🔄</div>
+                        <h3>Automate Busywork</h3>
+                        <p>Eliminate repetitive admin tasks. Focus on the work that actually makes you money.</p>
+                    </div>
+                    
+                    <div class="feature-card" role="listitem">
+                        <div class="feature-icon" aria-hidden="true">📱</div>
+                        <h3>Manage On the Go</h3>
+                        <p>Desktop, tablet, mobile. Your business moves with you.</p>
+                    </div>
+                </div>
+
+                <div class="stats" aria-label="TaskFlow statistics">
+                    <div class="stat">
+                        <div class="stat-number" aria-label="10 thousand plus">10K+</div>
+                        <div class="stat-label">Waitlist Signups</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" aria-label="95 percent">95%</div>
+                        <div class="stat-label">Satisfaction Rate</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" aria-label="50 plus">50+</div>
+                        <div class="stat-label">Countries</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Problem & Solution Section -->
+        <section class="problem-solution" aria-label="Freelancer problems and TaskFlow solutions">
+            <div class="problem-solution-container">
+                <div class="problem-column">
+                    <h2>You're Losing Time Every Single Day</h2>
+                    <ul class="problem-list">
+                        <li>Switching between 4+ apps to manage work</li>
+                        <li>Missing deadlines costs you clients</li>
+                        <li>Spending hours hunting for client info</li>
+                        <li>Losing track of project details</li>
+                        <li>Spending 5+ hours weekly on admin tasks</li>
+                    </ul>
+                </div>
+                <div class="solution-column">
+                    <h2>Get It All in One Place</h2>
+                    <ul class="solution-list">
+                        <li>One dashboard replaces 4+ tools</li>
+                        <li>Never miss another deadline again</li>
+                        <li>Find any client detail in seconds</li>
+                        <li>All projects visible at a glance</li>
+                        <li>Automate what steals your time</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Social Proof Section -->
+        <section class="social-proof" aria-label="What freelancers are saying about TaskFlow">
+            <div class="social-proof-container">
+                <h2 class="social-proof-title">Trusted by Freelancers Everywhere</h2>
+                <p class="social-proof-subtitle">Real feedback from real people using TaskFlow every day</p>
+
+                <div class="testimonials-grid">
+                    <div class="testimonial">
+                        <p class="testimonial-text">"Finally a tool built for freelancers, not corporate teams. TaskFlow is exactly what I've been looking for."</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">SJ</div>
+                            <div class="author-info">
+                                <h4>Sarah Johnson</h4>
+                                <p>Freelance Designer</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial">
+                        <p class="testimonial-text">"I stopped missing deadlines and my clients are happier. Worth every penny."</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">MC</div>
+                            <div class="author-info">
+                                <h4>Marcus Chen</h4>
+                                <p>Web Developer</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial">
+                        <p class="testimonial-text">"Saves me 5+ hours every week on admin work. That's an extra $500 in my pocket."</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">EK</div>
+                            <div class="author-info">
+                                <h4>Emma Kotov</h4>
+                                <p>Content Writer</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="trust-indicators">
+                    <div class="trust-indicator">
+                        <div class="trust-icon">👥</div>
+                        <div class="trust-text">Built for freelancers</div>
+                    </div>
+                    <div class="trust-indicator">
+                        <div class="trust-icon">⭐</div>
+                        <div class="trust-text">95% satisfaction rate</div>
+                    </div>
+                    <div class="trust-indicator">
+                        <div class="trust-icon">🌍</div>
+                        <div class="trust-text">Join 1,000+ early users</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="how-it-works" aria-label="Three-step process to get started with TaskFlow">
+            <div class="how-it-works-container">
+                <h2>Three Steps to Better Business Management</h2>
+
+                <div class="steps-grid">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Join the Waitlist</h3>
+                        <p>Give us your email and secure early access.</p>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Get Started Free</h3>
+                        <p>Access TaskFlow and start importing your clients and projects.</p>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Save 5+ Hours Weekly</h3>
+                        <p>Watch your efficiency soar and your stress drop immediately.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Waitlist Sign-Up Section -->
+        <section class="waitlist-section" id="waitlist" aria-label="Email signup form for TaskFlow early access">
+            <div class="waitlist-section-container">
+                <h2>Claim Your Spot</h2>
+                <p>TaskFlow launches in Q2 2026. Join now for early access and exclusive beta pricing.</p>
+
+                <form class="waitlist-form" id="waitlistForm2" aria-label="Email signup form">
+                    <div class="form-group">
+                        <label for="email2">Email <span aria-label="required">*</span></label>
+                        <input 
+                            type="email" 
+                            id="email2" 
+                            name="email" 
+                            placeholder="you@example.com"
+                            required
+                            autocomplete="email"
+                            aria-required="true"
+                            aria-describedby="email2-hint"
+                        >
+                        <span id="email2-hint" class="sr-only">We'll never share your email.</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="name2">Name <span aria-label="required">*</span></label>
+                        <input 
+                            type="text" 
+                            id="name2" 
+                            name="name" 
+                            placeholder="Your name"
+                            required
+                            autocomplete="given-name"
+                            aria-required="true"
+                        >
+                    </div>
+                    <button type="submit" class="submit-btn" aria-busy="false">Join the Waitlist</button>
+                    <div class="form-message" id="formMessage2" role="status" aria-live="polite" aria-atomic="true"></div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Final CTA Section -->
+        <section class="final-cta" aria-label="Final call to action with urgency messaging">
+            <div class="final-cta-container">
+                <h2>Don't Wait Another Week</h2>
+                <div class="urgency-message">🚀 Limited spots in the first 500 early users</div>
+                <p class="cta-subtext">Get TaskFlow before the launch. Early access members get lifetime discount on premium features.</p>
+                <button class="final-cta-btn" onclick="document.getElementById('waitlist').scrollIntoView({behavior: 'smooth'})">Join the Waitlist Now</button>
+            </div>
+        </section>
+    </main>
+
+    <footer role="contentinfo">
+        <p>&copy; 2026 TaskFlow. All rights reserved.</p>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <span class="separator">•</span>
+            <a href="#">Terms of Service</a>
+            <span class="separator">•</span>
+            <a href="#">Contact</a>
+        </div>
+        <div class="social-links" aria-label="Connect with us on social media">
+            <a href="#" aria-label="Visit our Twitter profile" title="Follow us on Twitter">Twitter</a>
+            <a href="#" aria-label="Visit our LinkedIn profile" title="Connect on LinkedIn">LinkedIn</a>
+            <a href="#" aria-label="Visit our Instagram profile" title="Follow us on Instagram">Instagram</a>
+        </div>
+        <p class="footer-tagline">Built for freelancers. Designed for success.</p>
+    </footer>
+
+    <script>
+        // ==================== PERFORMANCE: Debounce Function ====================
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // ==================== ACCESSIBILITY: Reduced Motion Check ====================
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // ==================== FORM HANDLING ====================
+        // Handle both form instances
+        const forms = document.querySelectorAll('.waitlist-form');
+        
+        forms.forEach(form => {
+            form.addEventListener('submit', handleFormSubmit);
+        });
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const formId = form.id;
+            const emailInput = form.querySelector('input[type="email"]');
+            const nameInput = form.querySelector('input[type="text"]');
+            const submitBtn = form.querySelector('.submit-btn');
+            const formMessage = form.querySelector('.form-message');
+            
+            const email = emailInput.value.trim();
+            const name = nameInput.value.trim();
+
+            // Clear previous messages
+            formMessage.className = 'form-message';
+
+            // Validate inputs
+            if (!email || !name) {
+                showFormMessage(form, 'Please fill in all fields', 'error');
+                emailInput.focus();
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                showFormMessage(form, 'Please enter a valid email address', 'error');
+                emailInput.focus();
+                return;
+            }
+
+            // Update accessibility state
+            submitBtn.setAttribute('aria-busy', 'true');
+            submitBtn.disabled = true;
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Joining...';
+
+            try {
+                // Simulate API call (replace with your actual endpoint)
+                await simulateEmailSubmission(name, email);
+                
+                showFormMessage(form, `✓ Thanks ${name}! Check your email for updates.`, 'success');
+                submitBtn.setAttribute('aria-busy', 'false');
+                form.reset();
+                emailInput.focus();
+                
+            } catch (error) {
+                showFormMessage(form, 'Something went wrong. Please try again.', 'error');
+                submitBtn.setAttribute('aria-busy', 'false');
+                console.error('Error:', error);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        }
+
+        function showFormMessage(form, text, type) {
+            const formMessage = form.querySelector('.form-message');
+            formMessage.textContent = text;
+            formMessage.className = `form-message ${type}`;
+            formMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        async function simulateEmailSubmission(name, email) {
+            // Simulate a 1.5 second API call
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    // 95% success rate for demo
+                    if (Math.random() > 0.05) {
+                        resolve({ success: true, message: 'Email registered' });
+                    } else {
+                        reject(new Error('API error'));
+                    }
+                }, 1500);
+            });
+        }
+
+        // ==================== SMOOTH SCROLL ====================
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href === '#') return;
+                
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) {
+                    const scrollBehavior = prefersReducedMotion ? 'auto' : 'smooth';
+                    target.scrollIntoView({
+                        behavior: scrollBehavior,
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // ==================== SCROLL REVEAL ANIMATIONS ====================
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    if (!prefersReducedMotion) {
+                        entry.target.style.animation = entry.target.getAttribute('data-animation') || 'fadeInUp 0.6s ease forwards';
+                    }
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements with animation attributes
+        document.querySelectorAll('[data-animation]').forEach(el => {
+            el.style.opacity = '0';
+            observer.observe(el);
+        });
+
+        // ==================== INPUT VALIDATION FEEDBACK ====================
+        // Apply validation listeners to all email and name inputs
+        document.querySelectorAll('input[type="email"]').forEach(emailInput => {
+            emailInput.addEventListener('change', function() {
+                if (this.value && !isValidEmail(this.value)) {
+                    this.setAttribute('aria-invalid', 'true');
+                    this.style.borderColor = '#f4b5b5';
+                } else {
+                    this.setAttribute('aria-invalid', 'false');
+                    this.style.borderColor = '#e8e8f0';
+                }
+            });
+        });
+
+        document.querySelectorAll('input[type="text"]').forEach(nameInput => {
+            nameInput.addEventListener('focus', function() {
+                this.style.borderColor = '#667eea';
+            });
+
+            nameInput.addEventListener('blur', function() {
+                if (!this.value) {
+                    this.style.borderColor = '#e8e8f0';
+                }
+            });
+        });
+
+        // ==================== PERFORMANCE: Throttled Scroll Listener ====================
+        let scrollTimeout;
+        const handleScroll = debounce(function() {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero');
+            if (hero && !prefersReducedMotion) {
+                hero.style.backgroundPosition = `0 ${scrolled * 0.5}px`;
+            }
+        }, 16);
+
+        document.addEventListener('scroll', handleScroll, { passive: true });
+
+        // ==================== PAGE LOAD OPTIMIZATIONS ====================
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializePage);
+        } else {
+            initializePage();
+        }
+
+        function initializePage() {
+            // Pre-focus first email input for better accessibility
+            const firstEmailInput = document.querySelector('input[type="email"]');
+            if (firstEmailInput) {
+                firstEmailInput.focus();
+            }
+            
+            // Log that page is interactive
+            if ('PerformanceObserver' in window) {
+                try {
+                    const perfObserver = new PerformanceObserver(list => {
+                        list.getEntries().forEach(entry => {
+                            console.log('Page metric:', entry.name, entry.duration);
+                        });
+                    });
+                    perfObserver.observe({ entryTypes: ['paint', 'largest-contentful-paint'] });
+                } catch (e) {
+                    // Performance API not supported
+                }
+            }
+        }
+
+        // ==================== CLEANUP ====================
+        window.addEventListener('beforeunload', () => {
+            document.removeEventListener('scroll', handleScroll);
+        });
+    </script>
+</body>
+</html>

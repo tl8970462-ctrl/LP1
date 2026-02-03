@@ -1,0 +1,48 @@
+{
+  "name": "taskflow-saas-landing",
+  "version": "1.0.0",
+  "description": "Professional, high-converting SaaS landing page template built with Next.js 13, TypeScript, and Tailwind CSS. Perfect for freelancers, agencies, and startups launching their product.",
+  "keywords": [
+    "saas",
+    "landing-page",
+    "next.js",
+    "typescript",
+    "tailwind-css",
+    "react",
+    "template",
+    "freelancer",
+    "startup",
+    "high-converting",
+    "responsive"
+  ],
+  "author": "TaskFlow",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/taskflow-landing"
+  },
+  "homepage": "https://taskflow-template.com",
+  "private": false,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "^13.5.11",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.55.0",
+    "eslint-config-next": "^14.0.0",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5.3.0"
+  }
+}
